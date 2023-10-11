@@ -1,0 +1,22 @@
+version: '3'
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: sreality
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+
+  init-db:
+    build: .
+    command: sh -c '/code/wait-for-it.sh db:5432 -t 30 -- /code/data_prep.sh'
+    depends_on:
+      - db
+
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - init-db
+      - db
